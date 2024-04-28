@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model BookCategories {
+  id                                                   String           @id(map: "PK_BookCategories") @default(dbgenerated("newid()"), map: "DF__BookCategori__id__4E88ABD4") @db.UniqueIdentifier
+  name                                                 String?          @db.NVarChar(500)
+  categoryId                                           String?          @db.UniqueIdentifier
+  fullText                                             String?          @db.NVarChar(500)
+  ISBN                                                 String?          @db.NVarChar(500)
+  languageId                                           String?          @db.UniqueIdentifier
+  UDC                                                  String?          @db.UniqueIdentifier
+  author                                               String?          @db.NVarChar(500)
+  title                                                String?          @db.NVarChar(500)
+  edition                                              Int?
+  pulishingPlace                                       String?          @db.NVarChar(500)
+  publisher                                            String?          @db.NVarChar(500)
+  pulishingYear                                        Int?
+  numberPage                                           Int?
+  size                                                 String?          @db.NVarChar(500)
+  coAuthor                                             String?          @db.NVarChar(500)
+  useDate                                              DateTime?        @db.DateTime
+  desc                                                 String?          @db.NVarChar(500)
+  orderNumber                                          Int?
+  createAt                                             DateTime?        @default(now(), map: "DF__BookCateg__creat__4F7CD00D") @db.DateTime
+  updateAt                                             DateTime?        @db.DateTime
+  isEnable                                             Boolean          @default(true, map: "DF__BookCateg__isEna__5070F446")
+  createBy                                             String?          @db.UniqueIdentifier
+  lastUpdateBy                                         String?          @db.UniqueIdentifier
+  BookCategories                                       BookCategories?  @relation("BookCategoriesToBookCategories", fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_BookCategories_category")
+  other_BookCategories                                 BookCategories[] @relation("BookCategoriesToBookCategories")
+  Users_BookCategories_createByToUsers                 Users?           @relation("BookCategories_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_BookCategories_CreateBy")
+  GeneralTypes_BookCategories_languageIdToGeneralTypes GeneralTypes?    @relation("BookCategories_languageIdToGeneralTypes", fields: [languageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_BookCategories_language")
+  Users_BookCategories_lastUpdateByToUsers             Users?           @relation("BookCategories_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_BookCategories_LastUpdateBy")
+  GeneralTypes_BookCategories_UDCToGeneralTypes        GeneralTypes?    @relation("BookCategories_UDCToGeneralTypes", fields: [UDC], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_BookCategories_UDC")
+  Books                                                Books[]
+}
+
+model Books {
+  id                              String          @id(map: "PK_Books") @default(dbgenerated("newid()"), map: "DF__Books__id__5441852A") @db.UniqueIdentifier
+  bookCategoryId                  String?         @db.UniqueIdentifier
+  status                          Boolean         @default(true, map: "DF__Books__status__5535A963")
+  barCode                         String?         @db.NVarChar(500)
+  locationId                      String?         @db.UniqueIdentifier
+  eId                             String?         @db.NVarChar(20)
+  warehouseType                   String?         @db.NChar(10)
+  orgId                           String?         @db.UniqueIdentifier
+  orderNumber                     Int?
+  createAt                        DateTime?       @default(now(), map: "DF__Books__createAt__5629CD9C") @db.DateTime
+  updateAt                        DateTime?       @db.DateTime
+  isEnable                        Boolean         @default(true, map: "DF__Books__isEnable__571DF1D5")
+  createBy                        String?         @db.UniqueIdentifier
+  lastUpdateBy                    String?         @db.UniqueIdentifier
+  BookCategories                  BookCategories? @relation(fields: [bookCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Books_bookCategory")
+  Users_Books_createByToUsers     Users?          @relation("Books_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Books_CreateBy")
+  Users_Books_lastUpdateByToUsers Users?          @relation("Books_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Books_LastUpdateBy")
+  OrderDetail                     OrderDetail[]
+}
+
+model GeneralTypes {
+  id                                                     String           @id(map: "PK_GeneralTypes") @default(dbgenerated("newid()"), map: "DF__GeneralTypes__id__778AC167") @db.UniqueIdentifier
+  code                                                   String?          @db.NVarChar(255)
+  name                                                   String?          @db.NVarChar(500)
+  shortName                                              String?          @db.NVarChar(255)
+  desc                                                   String?          @db.NVarChar(255)
+  scope                                                  String           @db.NVarChar(255)
+  business                                               String?          @db.NVarChar(255)
+  parentId                                               String?          @db.UniqueIdentifier
+  createAt                                               DateTime?        @default(now(), map: "DF__GeneralTy__creat__787EE5A0") @db.DateTime
+  updateAt                                               DateTime?        @db.DateTime
+  isEnable                                               Boolean          @default(true, map: "DF__GeneralTy__isEna__797309D9")
+  createBy                                               String?          @db.UniqueIdentifier
+  lastUpdateBy                                           String?          @db.UniqueIdentifier
+  BookCategories_BookCategories_languageIdToGeneralTypes BookCategories[] @relation("BookCategories_languageIdToGeneralTypes")
+  BookCategories_BookCategories_UDCToGeneralTypes        BookCategories[] @relation("BookCategories_UDCToGeneralTypes")
+  Users_GeneralTypes_createByToUsers                     Users?           @relation("GeneralTypes_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_GeneralTypes_CreateBy")
+  Users_GeneralTypes_lastUpdateByToUsers                 Users?           @relation("GeneralTypes_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_GeneralTypes_LastUpdateBy")
+  GeneralTypes                                           GeneralTypes?    @relation("GeneralTypesToGeneralTypes", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_GeneralTypes_parent")
+  other_GeneralTypes                                     GeneralTypes[]   @relation("GeneralTypesToGeneralTypes")
+}
+
+model Locations {
+  id                                  String    @id(map: "PK_Locations") @default(dbgenerated("newid()"), map: "DF__Locations__id__7D439ABD") @db.UniqueIdentifier
+  parentId                            String?   @db.UniqueIdentifier
+  name                                String?   @db.NVarChar(500)
+  fullName                            String?   @db.NVarChar(255)
+  order                               Int?
+  desc                                String?   @db.NVarChar(500)
+  isEnable                            Boolean   @default(true, map: "DF__Locations__isEna__7E37BEF6")
+  createAt                            DateTime? @default(now(), map: "DF__Locations__creat__7F2BE32F") @db.DateTime
+  updateAt                            DateTime? @db.DateTime
+  createBy                            String?   @db.UniqueIdentifier
+  lastUpdateBy                        String?   @db.UniqueIdentifier
+  Users_Locations_createByToUsers     Users?    @relation("Locations_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Locations_CreateBy")
+  Users_Locations_lastUpdateByToUsers Users?    @relation("Locations_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Locations_LastUpdateBy")
+}
+
+model OrderDetail {
+  id                                    String    @id(map: "PK_OrderDetail") @default(dbgenerated("newid()"), map: "DF__OrderDetail__id__5FB337D6") @db.UniqueIdentifier
+  orderId                               String?   @db.UniqueIdentifier
+  bookId                                String?   @db.UniqueIdentifier
+  createDate                            DateTime? @db.DateTime
+  dueDate                               DateTime? @db.DateTime
+  renewDate                             DateTime? @db.DateTime
+  isCheckRenew                          Boolean?
+  returnDate                            DateTime? @db.DateTime
+  isCheck                               Boolean?
+  createAt                              DateTime? @default(now(), map: "DF__OrderDeta__creat__60A75C0F") @db.DateTime
+  updateAt                              DateTime? @db.DateTime
+  isEnable                              Boolean   @default(true, map: "DF__OrderDeta__isEna__619B8048")
+  createBy                              String?   @db.UniqueIdentifier
+  lastUpdateBy                          String?   @db.UniqueIdentifier
+  Books                                 Books?    @relation(fields: [bookId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderDetail_book")
+  Users_OrderDetail_createByToUsers     Users?    @relation("OrderDetail_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderDetail_CreateBy")
+  Users_OrderDetail_lastUpdateByToUsers Users?    @relation("OrderDetail_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderDetail_LastUpdateBy")
+  Orders                                Orders?   @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_OrderDetail_order")
+}
+
+model Orders {
+  id                               String        @id(map: "PK_Orders") @default(dbgenerated("newid()"), map: "DF__Orders__id__59FA5E80") @db.UniqueIdentifier
+  creatorId                        String?       @db.UniqueIdentifier
+  checkById                        String?       @db.UniqueIdentifier
+  status                           Boolean       @default(true, map: "DF__Orders__status__5AEE82B9")
+  createAt                         DateTime?     @default(now(), map: "DF__Orders__createAt__5BE2A6F2") @db.DateTime
+  updateAt                         DateTime?     @db.DateTime
+  isEnable                         Boolean       @default(true, map: "DF__Orders__isEnable__5CD6CB2B")
+  createBy                         String?       @db.UniqueIdentifier
+  lastUpdateBy                     String?       @db.UniqueIdentifier
+  OrderDetail                      OrderDetail[]
+  Users_Orders_checkByIdToUsers    Users?        @relation("Orders_checkByIdToUsers", fields: [checkById], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Orders_checkBy")
+  Users_Orders_createByToUsers     Users?        @relation("Orders_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Orders_CreateBy")
+  Users_Orders_creatorIdToUsers    Users?        @relation("Orders_creatorIdToUsers", fields: [creatorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Orders_creator")
+  Users_Orders_lastUpdateByToUsers Users?        @relation("Orders_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Orders_LastUpdateBy")
+}
+
+model Properties {
+  id                                   String    @id(map: "PK_Properties") @default(dbgenerated("newid()"), map: "DF__Properties__id__6477ECF3") @db.UniqueIdentifier
+  name                                 String?   @db.NVarChar(500)
+  text                                 String?   @db.NVarChar(500)
+  index                                Int?
+  type                                 String?   @db.NVarChar(500)
+  unit                                 String?   @db.NVarChar(500)
+  isRequired                           Boolean?
+  conditions                           String?   @db.NVarChar(500)
+  createAt                             DateTime? @default(now(), map: "DF__Propertie__creat__656C112C") @db.DateTime
+  updateAt                             DateTime? @db.DateTime
+  isEnable                             Boolean   @default(true, map: "DF__Propertie__isEna__66603565")
+  createBy                             String?   @db.UniqueIdentifier
+  lastUpdateBy                         String?   @db.UniqueIdentifier
+  Users_Properties_createByToUsers     Users?    @relation("Properties_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Properties_CreateBy")
+  Users_Properties_lastUpdateByToUsers Users?    @relation("Properties_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Properties_LastUpdateBy")
+}
+
+model Publishers {
+  id                                   String    @id(map: "PK_Publishers") @default(dbgenerated("newid()"), map: "DF__Publishers__id__72C60C4A") @db.UniqueIdentifier
+  name                                 String?   @db.NVarChar(500)
+  location                             String?   @db.NVarChar(500)
+  phoneNumber                          String?   @db.NVarChar(500)
+  createAt                             DateTime? @default(now(), map: "DF__Publisher__creat__73BA3083") @db.DateTime
+  updateAt                             DateTime? @db.DateTime
+  isEnable                             Boolean   @default(true, map: "DF__Publisher__isEna__74AE54BC")
+  createBy                             String?   @db.UniqueIdentifier
+  lastUpdateBy                         String?   @db.UniqueIdentifier
+  Users_Publishers_createByToUsers     Users?    @relation("Publishers_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Publishers_CreateBy")
+  Users_Publishers_lastUpdateByToUsers Users?    @relation("Publishers_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Publishers_LastUpdateBy")
+}
+
+model Roles {
+  id                              String     @id(map: "PK_Roles") @default(dbgenerated("newid()"), map: "DF__Roles__id__693CA210") @db.UniqueIdentifier
+  roleName                        String?    @db.NVarChar(500)
+  desc                            String?    @db.NVarChar(500)
+  createAt                        DateTime?  @default(now(), map: "DF__Roles__createAt__6A30C649") @db.DateTime
+  updateAt                        DateTime?  @db.DateTime
+  isEnable                        Boolean    @default(true, map: "DF__Roles__isEnable__6B24EA82")
+  createBy                        String?    @db.UniqueIdentifier
+  lastUpdateBy                    String?    @db.UniqueIdentifier
+  Users_Roles_createByToUsers     Users?     @relation("Roles_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Roles_CreateBy")
+  Users_Roles_lastUpdateByToUsers Users?     @relation("Roles_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Roles_LastUpdateBy")
+  UserRole                        UserRole[]
+}
+
+model UserRole {
+  id                                 String    @id(map: "PK_UserRole") @default(dbgenerated("newid()"), map: "DF__UserRole__id__6E01572D") @db.UniqueIdentifier
+  userId                             String?   @db.UniqueIdentifier
+  roleId                             String?   @db.UniqueIdentifier
+  createAt                           DateTime? @default(now(), map: "DF__UserRole__create__6EF57B66") @db.DateTime
+  updateAt                           DateTime? @db.DateTime
+  isEnable                           Boolean   @default(true, map: "DF__UserRole__isEnab__6FE99F9F")
+  createBy                           String?   @db.UniqueIdentifier
+  lastUpdateBy                       String?   @db.UniqueIdentifier
+  Users_UserRole_createByToUsers     Users?    @relation("UserRole_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_UserRole_CreateBy")
+  Users_UserRole_lastUpdateByToUsers Users?    @relation("UserRole_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_UserRole_LastUpdateBy")
+  Roles                              Roles?    @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_UserRole_role")
+  Users_UserRole_userIdToUsers       Users?    @relation("UserRole_userIdToUsers", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_UserRole_user")
+}
+
+model Users {
+  id                                                String           @id(map: "PK_Users") @default(dbgenerated("newid()"), map: "DF__Users__id__49C3F6B7") @db.UniqueIdentifier
+  idTTTM                                            Int?
+  eQN                                               String?          @db.NVarChar(20)
+  username                                          String?          @db.NVarChar(20)
+  password                                          String?          @db.NVarChar(50)
+  cardNumber                                        String?          @db.NVarChar(50)
+  cardIssueDate                                     DateTime?        @db.DateTime
+  cardExpiryDate                                    DateTime?        @db.DateTime
+  codeBar                                           String?          @db.NVarChar(50)
+  checkById                                         String?          @db.UniqueIdentifier
+  createAt                                          DateTime?        @default(now(), map: "DF__Users__createAt__4AB81AF0") @db.DateTime
+  updateAt                                          DateTime?        @db.DateTime
+  isEnable                                          Boolean          @default(true, map: "DF__Users__isEnable__4BAC3F29")
+  createBy                                          String?          @db.UniqueIdentifier
+  lastUpdateBy                                      String?          @db.UniqueIdentifier
+  BookCategories_BookCategories_createByToUsers     BookCategories[] @relation("BookCategories_createByToUsers")
+  BookCategories_BookCategories_lastUpdateByToUsers BookCategories[] @relation("BookCategories_lastUpdateByToUsers")
+  Books_Books_createByToUsers                       Books[]          @relation("Books_createByToUsers")
+  Books_Books_lastUpdateByToUsers                   Books[]          @relation("Books_lastUpdateByToUsers")
+  GeneralTypes_GeneralTypes_createByToUsers         GeneralTypes[]   @relation("GeneralTypes_createByToUsers")
+  GeneralTypes_GeneralTypes_lastUpdateByToUsers     GeneralTypes[]   @relation("GeneralTypes_lastUpdateByToUsers")
+  Locations_Locations_createByToUsers               Locations[]      @relation("Locations_createByToUsers")
+  Locations_Locations_lastUpdateByToUsers           Locations[]      @relation("Locations_lastUpdateByToUsers")
+  OrderDetail_OrderDetail_createByToUsers           OrderDetail[]    @relation("OrderDetail_createByToUsers")
+  OrderDetail_OrderDetail_lastUpdateByToUsers       OrderDetail[]    @relation("OrderDetail_lastUpdateByToUsers")
+  Orders_Orders_checkByIdToUsers                    Orders[]         @relation("Orders_checkByIdToUsers")
+  Orders_Orders_createByToUsers                     Orders[]         @relation("Orders_createByToUsers")
+  Orders_Orders_creatorIdToUsers                    Orders[]         @relation("Orders_creatorIdToUsers")
+  Orders_Orders_lastUpdateByToUsers                 Orders[]         @relation("Orders_lastUpdateByToUsers")
+  Properties_Properties_createByToUsers             Properties[]     @relation("Properties_createByToUsers")
+  Properties_Properties_lastUpdateByToUsers         Properties[]     @relation("Properties_lastUpdateByToUsers")
+  Publishers_Publishers_createByToUsers             Publishers[]     @relation("Publishers_createByToUsers")
+  Publishers_Publishers_lastUpdateByToUsers         Publishers[]     @relation("Publishers_lastUpdateByToUsers")
+  Roles_Roles_createByToUsers                       Roles[]          @relation("Roles_createByToUsers")
+  Roles_Roles_lastUpdateByToUsers                   Roles[]          @relation("Roles_lastUpdateByToUsers")
+  UserRole_UserRole_createByToUsers                 UserRole[]       @relation("UserRole_createByToUsers")
+  UserRole_UserRole_lastUpdateByToUsers             UserRole[]       @relation("UserRole_lastUpdateByToUsers")
+  UserRole_UserRole_userIdToUsers                   UserRole[]       @relation("UserRole_userIdToUsers")
+  Users_Users_createByToUsers                       Users?           @relation("Users_createByToUsers", fields: [createBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Users_CreateBy")
+  other_Users_Users_createByToUsers                 Users[]          @relation("Users_createByToUsers")
+  Users_Users_lastUpdateByToUsers                   Users?           @relation("Users_lastUpdateByToUsers", fields: [lastUpdateBy], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Users_LastUpdateBy")
+  other_Users_Users_lastUpdateByToUsers             Users[]          @relation("Users_lastUpdateByToUsers")
+}
