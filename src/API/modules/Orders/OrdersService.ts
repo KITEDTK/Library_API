@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { Issue } from './OrderTypes';
+import { OrderDetailArray } from "./OrderTypes";
 
 const prisma = new PrismaClient();
 
@@ -21,4 +23,40 @@ async function getOrderDetailByOrder(orderId: string, status: string){
     });
     return orderDetails;
 }
-export default {getOrdersByStatus, getOrderDetailByOrder};
+async function createIssue(input: Issue){
+    const {creatorId, createBy} = input;
+    const checkExistCreator = await prisma.users.findUnique({
+        where: { 
+            id: creatorId
+        }
+    });
+    if(!checkExistCreator){
+        throw 'error';
+    }
+    const checkExistCreateBy = await prisma.users.findUnique({
+        where:{
+            id: createBy
+        }
+    });
+    if(!checkExistCreateBy){
+        throw 'error';
+    }
+    const issue = await prisma.orders.create({
+        data: input
+    })
+    return issue;
+}
+async function createDetailIssue(input: OrderDetailArray, orderId: string){
+    const {...rest} = input;
+    const arrayInput = rest.map((od)=>{
+        return {
+            ...od,
+            orderId: orderId
+        }
+    });
+    const result = await prisma.orderDetail.createMany({
+        data: arrayInput
+    });
+    return result;
+}
+export default {getOrdersByStatus, getOrderDetailByOrder, createIssue, createDetailIssue};
