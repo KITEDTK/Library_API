@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { seachBookCategory, searchQuery } from "./BookCategoriesTypes";
+import { seachBookCategory, BookCategoryArray } from "./BookCategoriesTypes";
 const prisma = new PrismaClient();
 
 async function getAllBookCategories() {
@@ -79,4 +79,35 @@ async function search(input: seachBookCategory) {
 
   return result;
 }
-export default { getAllBookCategories, getBooksByBookCategories, search };
+async function add(input: BookCategoryArray){
+    const {...rest} = input;
+    rest.map(async(bc)=>{
+        if(bc.UDC){
+            const checkExistUDC = await prisma.generalTypes.findFirst({
+                where:{
+                    name: bc.UDC
+                }
+            });
+            if(!checkExistUDC){
+                throw 'error at' + bc;
+            }
+        }
+        if(bc.language){
+            const checkExistLanguage = await prisma.generalTypes.findFirst({
+                where:{
+                    name: bc.language
+                }
+            });
+            if(!checkExistLanguage){
+                throw 'error at' + bc;
+            }
+        }
+    })
+    const result = await prisma.bookCategories.createMany({
+        data: {
+            ...rest
+        }
+    });
+    return result;
+}
+export default { getAllBookCategories, getBooksByBookCategories, search, add };
