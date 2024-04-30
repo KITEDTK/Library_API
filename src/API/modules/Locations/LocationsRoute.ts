@@ -4,5 +4,8 @@ const router = Router();
 
 router.get("/:id", LocationsController.getAll);
 router.post("locations/root",LocationsController.createRootlocation);
+router.post("/:locationId/tree", LocationsController.createChildLocation);
+router.patch("/:locationId", LocationsController.updateLocation);
+router.delete("/:locationId", LocationsController.deleteLocation);
 
 export default router;
