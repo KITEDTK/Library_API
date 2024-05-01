@@ -26,5 +26,13 @@ async function addBookCategories(req: Request, res: Response){
         console.log(err);
       }
 }
-
-export default {getAllBookCategories, getBooksByBookCategories, addBookCategories};
+async function getBookCategoriesByLocations(req: Request, res: Response){
+  try {
+    const {locationId} = req.params;
+    const result = await BookCategoriesService.getBooksByBookCategories(locationId);
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+}
+export default {getAllBookCategories, getBooksByBookCategories, addBookCategories, getBookCategoriesByLocations};

@@ -110,4 +110,27 @@ async function add(input: BookCategoryArray){
     });
     return result;
 }
-export default { getAllBookCategories, getBooksByBookCategories, search, add };
+async function bookCategoriesByLocations(locationId: string){
+  const locationIds: Array<any> = await prisma.$queryRaw`WITH allLocations AS (
+    SELECT id
+    FROM Locations
+    WHERE id = ${locationId} 
+    UNION ALL
+    SELECT c.id
+    FROM Locations c
+    INNER JOIN allLocations a ON c.parentId = a.id
+)
+SELECT id FROM allLocations`;
+  const result = await prisma.bookCategories.findMany({
+    where:{
+      Books:{
+        some:{
+          locationId :{ in: locationIds}
+        }
+      }
+    }
+  });
+  return result
+}
+
+export default { getAllBookCategories, getBooksByBookCategories, search, add, bookCategoriesByLocations };
