@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { User, UserArray } from "./UsersType";
+import { User, UserArray, Roles } from "./UsersType";
 
 const prisma = new PrismaClient();
 
@@ -39,4 +39,57 @@ async function getSingleUser(userId: string){
     });
     return user;
 }
-export default { createManyUsers, updateUser, deleteUser, getAllUsers, getSingleUser };
+async function createUserRoles(userId: string, roleIdsInput: Roles){
+  const {roleIds} = roleIdsInput;
+  roleIds.forEach( async (r)=>{
+    const checkExistRoles = await prisma.roles.findUnique({
+      where: {
+        id: r
+      }
+    });
+    if(checkExistRoles){
+      throw 'error';
+    }
+  })
+  const dataInput = roleIds.map((r)=>{
+    return {
+      roleId: r,
+      userId: userId
+    }
+  })
+  const result = await prisma.userRole.createMany({
+    data: {
+      ...dataInput
+    }
+  })
+  return result;
+}
+async function updateUserRoles(userId: string, roleIdsInput: Roles){
+  const {roleIds} = roleIdsInput;
+  roleIds.forEach( async (r)=>{
+    const checkExistRoles = await prisma.roles.findUnique({
+      where: {
+        id: r
+      }
+    });
+    if(checkExistRoles){
+      throw 'error';
+    };
+  });
+  const dataInput = roleIds.map((r)=>{
+    return {
+      roleId: r,
+      userId: userId
+    }
+  });
+  const result = await prisma.userRole.updateMany({
+    where:{
+      userId: userId
+    },
+    data:{
+      ...dataInput
+    }
+  });
+  return result;
+}
+export default { createManyUsers, updateUser, deleteUser, getAllUsers, getSingleUser, createUserRoles, updateUserRoles };

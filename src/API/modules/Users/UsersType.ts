@@ -11,3 +11,7 @@ export interface User {
 }; 
 export interface UserArray extends Array<User> {}
 
+export interface Roles{
+    roleIds: Array<string>
+}
+
