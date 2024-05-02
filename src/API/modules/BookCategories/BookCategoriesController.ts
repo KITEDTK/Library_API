@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import BookCategoriesService from "./BookCategoriesService";
+import { BookCategory } from './BookCategoriesTypes';
 
 async function getAllBookCategories(req: Request, res: Response){
     try {
@@ -35,4 +36,13 @@ async function getBookCategoriesByLocations(req: Request, res: Response){
     console.log(err);
   }
 }
-export default {getAllBookCategories, getBooksByBookCategories, addBookCategories, getBookCategoriesByLocations};
+async function getBooksOrderIssue(req: Request, res: Response){
+  try {
+    const {BookCategoryId} = req.params;
+    const result = await BookCategoriesService.getBooksOrderIssue(BookCategoryId);
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+}
+export default {getAllBookCategories, getBooksByBookCategories, addBookCategories, getBookCategoriesByLocations,getBooksOrderIssue};

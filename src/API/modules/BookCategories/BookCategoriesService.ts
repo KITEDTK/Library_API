@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { seachBookCategory, BookCategoryArray } from "./BookCategoriesTypes";
+import { Books } from '../Books/BooksTypes';
 const prisma = new PrismaClient();
 
 async function getAllBookCategories() {
@@ -69,48 +70,48 @@ async function search(input: seachBookCategory) {
         ...(UDC ? { name: UDC } : {}),
       },
       Books: {
-        some:{
-            ...(locationId !== null ? {locationId: locationId.id} : {}),
-            ...(barcode ? {barCode: barcode} : {})
+        some: {
+          ...(locationId !== null ? { locationId: locationId.id } : {}),
+          ...(barcode ? { barCode: barcode } : {}),
         },
-      }
+      },
     },
   });
 
   return result;
 }
-async function add(input: BookCategoryArray){
-    const {...rest} = input;
-    rest.map(async(bc)=>{
-        if(bc.UDC){
-            const checkExistUDC = await prisma.generalTypes.findFirst({
-                where:{
-                    name: bc.UDC
-                }
-            });
-            if(!checkExistUDC){
-                throw 'error at' + bc;
-            }
-        }
-        if(bc.language){
-            const checkExistLanguage = await prisma.generalTypes.findFirst({
-                where:{
-                    name: bc.language
-                }
-            });
-            if(!checkExistLanguage){
-                throw 'error at' + bc;
-            }
-        }
-    })
-    const result = await prisma.bookCategories.createMany({
-        data: {
-            ...rest
-        }
-    });
-    return result;
+async function add(input: BookCategoryArray) {
+  const { ...rest } = input;
+  rest.map(async (bc) => {
+    if (bc.UDC) {
+      const checkExistUDC = await prisma.generalTypes.findFirst({
+        where: {
+          name: bc.UDC,
+        },
+      });
+      if (!checkExistUDC) {
+        throw "error at" + bc;
+      }
+    }
+    if (bc.language) {
+      const checkExistLanguage = await prisma.generalTypes.findFirst({
+        where: {
+          name: bc.language,
+        },
+      });
+      if (!checkExistLanguage) {
+        throw "error at" + bc;
+      }
+    }
+  });
+  const result = await prisma.bookCategories.createMany({
+    data: {
+      ...rest,
+    },
+  });
+  return result;
 }
-async function bookCategoriesByLocations(locationId: string){
+async function bookCategoriesByLocations(locationId: string) {
   const locationIds: Array<any> = await prisma.$queryRaw`WITH allLocations AS (
     SELECT id
     FROM Locations
@@ -122,15 +123,56 @@ async function bookCategoriesByLocations(locationId: string){
 )
 SELECT id FROM allLocations`;
   const result = await prisma.bookCategories.findMany({
+    where: {
+      Books: {
+        some: {
+          locationId: { in: locationIds },
+        },
+      },
+    },
+  });
+  return result;
+}
+async function getBooksOrderIssue(bookCategoryId: string) {
+  const checkExist = await prisma.bookCategories.findUnique({
     where:{
-      Books:{
-        some:{
-          locationId :{ in: locationIds}
-        }
-      }
+      id: bookCategoryId
     }
   });
-  return result
+  if(!checkExist){
+    throw 'error';
+  }
+  const booksIds = await prisma.books.findMany({
+    where:{
+      bookCategoryId: bookCategoryId,
+    },
+    select:{
+      id: true
+    }
+  });
+  let issued:Array<any> = [];
+  let free:Array<any> = [];
+  booksIds.forEach(async(b)=>{
+    const order = await prisma.orderDetail.findFirst({
+      where:{
+        bookId: b.id,
+        isCheck: true,
+        returnDate: null
+      }
+    });
+    if(order){
+      issued.push(b);
+    }else{
+      free.push(b);
+    }
+  });
+  return {issued: issued, free: free}
 }
-
-export default { getAllBookCategories, getBooksByBookCategories, search, add, bookCategoriesByLocations };
+export default {
+  getAllBookCategories,
+  getBooksByBookCategories,
+  search,
+  add,
+  bookCategoriesByLocations,
+  getBooksOrderIssue
+};

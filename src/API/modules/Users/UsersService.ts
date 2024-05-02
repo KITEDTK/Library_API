@@ -47,7 +47,7 @@ async function createUserRoles(userId: string, roleIdsInput: Roles){
         id: r
       }
     });
-    if(checkExistRoles){
+    if(!checkExistRoles){
       throw 'error';
     }
   })
@@ -72,7 +72,7 @@ async function updateUserRoles(userId: string, roleIdsInput: Roles){
         id: r
       }
     });
-    if(checkExistRoles){
+    if(!checkExistRoles){
       throw 'error';
     };
   });
