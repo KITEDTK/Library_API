@@ -49,39 +49,49 @@ async function search(input: seachBookCategory) {
       id: true,
     },
   });
+  const test = await prisma.bookCategories.findMany({
+    where:{
+      name:{
+        
+      }
+    }
+  })
   const result = await prisma.bookCategories.findMany({
     where: {
-      ...(name ? { name: name } : {}),
-      ...(fullText ? { fullText: fullText } : {}),
-      ...(ISBN ? { ISBN: ISBN } : {}),
-      ...(author ? { author: author } : {}),
-      ...(title ? { title: title } : {}),
+      ...(name ? { name: {contains : name} } : {}),
+      ...(fullText ? { fullText: {contains: fullText} } : {}),
+      ...(ISBN ? { ISBN: {contains: ISBN} } : {}),
+      ...(author ? { author: {contains: author} } : {}),
+      ...(title ? { title: {contains: title} } : {}),
       ...(edition ? { edition: edition } : {}),
-      ...(publisher ? { publisher: publisher } : {}),
-      ...(publishingPlace ? { pulishingPlace: publishingPlace } : {}),
+      ...(publisher ? { publisher: {contains: publisher} } : {}),
+      ...(publishingPlace ? { pulishingPlace: {contains: publishingPlace} } : {}),
       ...(pulishingYear ? { pulishingYear: pulishingYear } : {}),
-      ...(numberPage ? { numberPage: numberPage } : {}),
+      ...(numberPage ? { numberPage:  numberPage } : {}),
       ...(size ? { size: size } : {}),
       ...(coAuthor ? { coAuthor: coAuthor } : {}),
-      GeneralTypes_BookCategories_languageIdToGeneralTypes: {
-        ...(language ? { name: language } : {}),
-      },
-      GeneralTypes_BookCategories_UDCToGeneralTypes: {
-        ...(UDC ? { name: UDC } : {}),
-      },
-      Books: {
-        some: {
-          ...(locationId !== null ? { locationId: locationId.id } : {}),
-          ...(barcode ? { barCode: barcode } : {}),
-        },
-      },
+      // GeneralTypes_BookCategories_languageIdToGeneralTypes: {
+      //   ...(language ? { name: language } : {}),
+      // },
+      // GeneralTypes_BookCategories_UDCToGeneralTypes: {
+      //   ...(UDC ? { name: UDC } : {}),
+      // },
+      // Books: {
+      //   some: {
+      //     ...(locationId !== null ? { locationId: locationId.id } : {}),
+      //     ...(barcode ? { barCode: barcode } : {}),
+      //   },
+      // },
     },
+    include:{
+      Books:{}
+    }
   });
 
   return result;
 }
 async function add(input: BookCategoryArray) {
-  const { ...rest } = input;
+  const [...rest] = input;
   rest.map(async (bc) => {
     if (bc.UDC) {
       const checkExistUDC = await prisma.generalTypes.findFirst({
@@ -105,9 +115,7 @@ async function add(input: BookCategoryArray) {
     }
   });
   const result = await prisma.bookCategories.createMany({
-    data: {
-      ...rest,
-    },
+    data: [...input],
   });
   return result;
 }

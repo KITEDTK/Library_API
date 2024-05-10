@@ -8,5 +8,6 @@ router.get("/:bookCategoryId/books",BookCategoriesController.getBooksByBookCateg
 router.post("/",BookCategoriesController.addBookCategories);
 router.get("/locations/:locationId", BookCategoriesController.getBookCategoriesByLocations);
 router.get("/:bookCategoryId", BookCategoriesController.getBooksOrderIssue);
+router.post("/search", BookCategoriesController.search);
 
 export default router;
