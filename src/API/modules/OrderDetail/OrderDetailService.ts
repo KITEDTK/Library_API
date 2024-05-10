@@ -19,7 +19,10 @@ async function returnBook(barcode: string){
     }
     const result = await prisma.orderDetail.update({
         where:{
-            id: orderId.id
+            id: orderId.id,
+            Books:{
+                barCode: barcode
+            }
         },
         data:{
             returnDate: new Date()

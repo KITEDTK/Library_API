@@ -14,8 +14,8 @@ app.use("/api/users", UserRoute);
 app.use("/api/orders",OrdersRoute);
 app.use("/api/bookCategories",BookCategoriesRoute);
 app.use("/api/books",BooksRoute);
-app.use("api/orderDetails",OrderDetailRoute);
-app.use("api/locations",LocationsRoute);
+app.use("/api/orderDetails",OrderDetailRoute);
+app.use("/api/locations",LocationsRoute);
 
 const PORT = 4000;
 

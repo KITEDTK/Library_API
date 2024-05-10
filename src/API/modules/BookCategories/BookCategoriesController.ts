@@ -37,8 +37,8 @@ async function getBookCategoriesByLocations(req: Request, res: Response){
 }
 async function getBooksOrderIssue(req: Request, res: Response){
   try {
-    const {BookCategoryId} = req.params;
-    const result = await BookCategoriesService.getBooksOrderIssue(BookCategoryId);
+    const {bookCategoryId} = req.params;
+    const result = await BookCategoriesService.getBooksOrderIssue(bookCategoryId);
     res.send(result);
   } catch (err) {
     console.log(err);

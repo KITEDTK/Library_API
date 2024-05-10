@@ -47,8 +47,7 @@ async function createIssue(input: Issue){
     return issue;
 }
 async function createDetailIssue(input: OrderDetailArray, orderId: string){
-    const {...rest} = input;
-    const arrayInput = rest.map((od)=>{
+    const arrayInput = input.map((od)=>{
         return {
             ...od,
             orderId: orderId

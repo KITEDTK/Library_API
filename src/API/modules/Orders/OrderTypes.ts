@@ -3,7 +3,6 @@ export interface Issue{
     createBy: string;
 }
 export interface OrderDetail{
-    orderId : string;
     bookId: string;
     createDate?: Date;
     dueDate?: Date;

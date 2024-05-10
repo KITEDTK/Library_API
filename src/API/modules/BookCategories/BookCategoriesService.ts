@@ -49,13 +49,6 @@ async function search(input: seachBookCategory) {
       id: true,
     },
   });
-  const test = await prisma.bookCategories.findMany({
-    where:{
-      name:{
-        
-      }
-    }
-  })
   const result = await prisma.bookCategories.findMany({
     where: {
       ...(name ? { name: {contains : name} } : {}),
@@ -150,30 +143,35 @@ async function getBooksOrderIssue(bookCategoryId: string) {
   if(!checkExist){
     throw 'error';
   }
-  const booksIds = await prisma.books.findMany({
+  const booksByBookCategoryId = await prisma.books.findMany({
     where:{
       bookCategoryId: bookCategoryId,
-    },
-    select:{
-      id: true
     }
   });
-  let issued:Array<any> = [];
-  let free:Array<any> = [];
-  booksIds.forEach(async(b)=>{
-    const order = await prisma.orderDetail.findFirst({
-      where:{
-        bookId: b.id,
-        isCheck: true,
-        returnDate: null
+  const bookIdsArray = booksByBookCategoryId.map((b)=> b.id);
+  const issued = await prisma.books.findMany({
+    where:{
+      bookCategoryId: bookCategoryId,
+      OrderDetail:{
+        some:{
+          bookId: {in : bookIdsArray},
+          returnDate: null,
+          isCheck: true
+        }
       }
-    });
-    if(order){
-      issued.push(b);
-    }else{
-      free.push(b);
     }
   });
+  const issuedIds = issued.map((i)=> i.id);
+  const free = await prisma.books.findMany({
+    where:{
+      bookCategoryId: bookCategoryId,
+      id: {
+        not:{
+          in: issuedIds
+        }
+      }
+    }
+  })
   return {issued: issued, free: free}
 }
 export default {
